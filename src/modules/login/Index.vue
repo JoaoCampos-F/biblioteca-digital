@@ -1,35 +1,38 @@
 <script lang="ts" setup>
 import { ref } from "vue";
+import { http } from "../../services/http/http";
+
 const referenciaFormulario = ref();
 
-const formalarioLogin = ref({
+const formularioLogin = ref({
   email: "",
-  senha: "",
+  password: "",
 });
 
 async function Login() {
   try {
-    const valid = await referenciaFormulario.value.validate();
+    const valid = await referenciaFormulario.value?.validate();
+
     if (!valid.valid) return;
+    const response = await http.post("/login", formularioLogin.value);
+    console.log(response.data);
   } catch (e) {
     console.log(e);
   }
 }
 
 function regras(valor: string) {
-  if (valor.length >= 8) return true;
-  return "A senha precisa ter pelo menos 8 caracteres";
+  if (valor.length >= 4) return true;
+  return "A senha precisa ter pelo menos 4 caracteres";
 }
-
-function validaEmail() {}
 </script>
 
 <template>
-  <v-form ref="referenciaFormulario" @submit.prevent>
+  <v-form ref="referenciaFormulario" @submit.prevent="Login">
     <v-card class="mx-auto mt-15" width="600">
       <v-toolbar color="success">
         <v-card-title>
-          <span>Bem vindo a Biblioteca Digital</span>
+          <span>Bem-vindo à Biblioteca Digital</span>
         </v-card-title>
       </v-toolbar>
       <v-card-text>
@@ -38,27 +41,25 @@ function validaEmail() {}
             <v-text-field
               type="email"
               label="Email"
-              v-model="formalarioLogin.email"
-            ></v-text-field>
+              v-model="formularioLogin.email"
+            />
           </v-col>
           <v-col cols="12">
             <v-text-field
               :rules="[regras]"
               type="password"
               label="Senha"
-              v-model="formalarioLogin.senha"
-            ></v-text-field>
+              v-model="formularioLogin.password"
+            />
           </v-col>
         </v-row>
       </v-card-text>
 
       <v-card-actions>
-        <v-btn variant="outlined" color="info"> Cadastrar</v-btn>
+        <v-btn variant="outlined" color="info">Cadastrar</v-btn>
         <v-spacer></v-spacer>
         <v-btn variant="outlined" @click="Login" color="primary">Login</v-btn>
       </v-card-actions>
     </v-card>
   </v-form>
 </template>
-
-<style></style>
