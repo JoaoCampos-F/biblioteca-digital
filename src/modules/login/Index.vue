@@ -1,23 +1,40 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 import { http } from "../../services/http/http";
+import { useRouter } from "vue-router";
+import axios from "axios";
 
+const router = useRouter();
 const referenciaFormulario = ref();
 
 const formularioLogin = ref({
-  email: "",
-  password: "",
+  usuario: "",
+  senha: "",
 });
 
-async function Login() {
+async function fazerLogin() {
   try {
     const valid = await referenciaFormulario.value?.validate();
-
     if (!valid.valid) return;
-    const response = await http.post("/login", formularioLogin.value);
-    console.log(response.data);
-  } catch (e) {
-    console.log(e);
+    
+    const response = await http.post("/api/auth/login", formularioLogin.value);
+    
+    if (response.data === "CREDENCIAIS AUTORIZADAS") {
+      // Redireciona para a página home
+      router.push("/");
+    } else {
+      // Mostra alerta com a mensagem de erro
+      alert(response.data);
+    }
+    
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      alert(error.response.data);
+    } else {
+      // Erro genérico
+      alert("Ocorreu um erro durante o login. Por favor, tente novamente.");
+      console.error("Erro no login:", error);
+    }
   }
 }
 
@@ -28,7 +45,7 @@ function regras(valor: string) {
 </script>
 
 <template>
-  <v-form ref="referenciaFormulario" @submit.prevent="Login">
+  <v-form ref="referenciaFormulario" @submit.prevent="fazerLogin">
     <v-card class="mx-auto mt-15" width="600">
       <v-toolbar color="success">
         <v-card-title>
@@ -39,9 +56,9 @@ function regras(valor: string) {
         <v-row>
           <v-col cols="12">
             <v-text-field
-              type="email"
-              label="Email"
-              v-model="formularioLogin.email"
+              label="Usuário"
+              v-model="formularioLogin.usuario"
+              :rules="[regras]"
             />
           </v-col>
           <v-col cols="12">
@@ -49,7 +66,7 @@ function regras(valor: string) {
               :rules="[regras]"
               type="password"
               label="Senha"
-              v-model="formularioLogin.password"
+              v-model="formularioLogin.senha"
             />
           </v-col>
         </v-row>
@@ -58,7 +75,7 @@ function regras(valor: string) {
       <v-card-actions>
         <v-btn variant="outlined" color="info">Cadastrar</v-btn>
         <v-spacer></v-spacer>
-        <v-btn variant="outlined" @click="Login" color="primary">Login</v-btn>
+        <v-btn variant="outlined" @click="fazerLogin" color="primary">Login</v-btn>
       </v-card-actions>
     </v-card>
   </v-form>

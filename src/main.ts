@@ -4,7 +4,7 @@ import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
 import "vuetify/styles";
 import App from "./App.vue";
-import { router } from "./routes";
+import { router } from "./routes/Index";
 
 const vuetify = createVuetify({
   theme: {
