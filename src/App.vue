@@ -4,7 +4,10 @@
   <router-view />
 </template>
 
-<style scoped>
+<style>
+.v-list-item-title {
+  font-size: 1.07rem !important;
+}
 .logo {
   height: 6em;
   padding: 1.5em;

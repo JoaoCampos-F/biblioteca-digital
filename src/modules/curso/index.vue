@@ -1,12 +1,6 @@
 <template>
-  <v-container class="d-flex justify-center align-center py-10">
-    <v-card max-width="90%" class="pa-6 rounded-xl elevation-4" width="100%">
-      <!-- Título -->
-      <v-card-title class="text-h5 font-weight-bold mb-4">
-        Gerenciar Cursos
-      </v-card-title>
-
-      <!-- Pesquisa + Botão Cadastrar -->
+  <DefaultLayout>
+    <CardContent title="Gerenciar Cursos">
       <v-row align="center" class="mb-6">
         <v-col cols="12" md="8">
           <v-text-field
@@ -32,30 +26,30 @@
           </tr>
         </thead>
         <tbody>
-  <tr v-for="curso in cursosFiltradosOrdenados" :key="curso.id">
-    <td>{{ curso.nome }}</td>
-    <td>{{ curso.cargaHoraria }}</td>
-    <td>
-      <v-row justify="end" no-gutters>
-        <v-btn
-          size="small"
-          color="info"
-          class="me-2"
-          @click="editarCurso(curso)"
-        >
-          Editar
-        </v-btn>
-        <v-btn
-          size="small"
-          color="error"
-          @click="excluirCurso(curso.id)"
-        >
-          Excluir
-        </v-btn>
-      </v-row>
-    </td>
-  </tr>
-</tbody>
+          <tr v-for="curso in cursosFiltradosOrdenados" :key="curso.id">
+            <td>{{ curso.nome }}</td>
+            <td>{{ curso.cargaHoraria }}</td>
+            <td>
+              <v-row justify="end" no-gutters>
+                <v-btn
+                  size="small"
+                  color="info"
+                  class="me-2"
+                  @click="editarCurso(curso)"
+                >
+                  Editar
+                </v-btn>
+                <v-btn
+                  size="small"
+                  color="error"
+                  @click="excluirCurso(curso.id)"
+                >
+                  Excluir
+                </v-btn>
+              </v-row>
+            </td>
+          </tr>
+        </tbody>
       </v-table>
 
       <!-- Dialog para Criar/Editar -->
@@ -63,12 +57,16 @@
         <v-card>
           <v-card-title>
             <span class="text-h6">
-              {{ cursoSelecionado ? 'Editar Curso' : 'Novo Curso' }}
+              {{ cursoSelecionado ? "Editar Curso" : "Novo Curso" }}
             </span>
           </v-card-title>
 
           <v-card-text>
-            <v-form @submit.prevent="salvarCurso" ref="formRef" v-model="formValido">
+            <v-form
+              @submit.prevent="salvarCurso"
+              ref="formRef"
+              v-model="formValido"
+            >
               <v-text-field
                 v-model="form.nome"
                 label="Nome do Curso"
@@ -97,120 +95,120 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-    </v-card>
-  </v-container>
+    </CardContent>
+  </DefaultLayout>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from "vue";
+import DefaultLayout from "../../layout/default.vue";
+import CardContent from "../../components/CardContent.vue";
 
 interface Curso {
-  id: string
-  nome: string
-  cargaHoraria: number
+  id: string;
+  nome: string;
+  cargaHoraria: number;
 }
 
-const cursos = ref<Curso[]>([])
-const filtro = ref('')
-const dialog = ref(false)
-const cursoSelecionado = ref<Curso | null>(null)
+const cursos = ref<Curso[]>([]);
+const filtro = ref("");
+const dialog = ref(false);
+const cursoSelecionado = ref<Curso | null>(null);
 
 const form = reactive({
-  nome: '',
+  nome: "",
   cargaHoraria: null as number | null,
-})
+});
 
-const formRef = ref()
-const formValido = ref(false)
+const formRef = ref();
+const formValido = ref(false);
 
 const rules = {
-  required: (v: any) => !!v || 'Campo obrigatório',
-  positive: (v: number) => v > 0 || 'Deve ser maior que zero',
-}
+  required: (v: any) => !!v || "Campo obrigatório",
+  positive: (v: number) => v > 0 || "Deve ser maior que zero",
+};
 
 const cursosFiltradosOrdenados = computed(() =>
   cursos.value
-    .filter(c =>
-      c.nome.toLowerCase().includes(filtro.value.toLowerCase())
-    )
+    .filter((c) => c.nome.toLowerCase().includes(filtro.value.toLowerCase()))
     .sort((a, b) => a.nome.localeCompare(b.nome))
-)
+);
 
 onMounted(() => {
-  carregarCursos()
-})
+  carregarCursos();
+});
 
 async function carregarCursos() {
   try {
-    const res = await fetch('http://localhost:8080/api/curso/buscar?all=true')
-    cursos.value = await res.json()
+    const res = await fetch("http://localhost:8080/api/curso/buscar?all=true");
+    cursos.value = await res.json();
   } catch (err) {
-    console.error('Erro ao carregar cursos:', err)
+    console.error("Erro ao carregar cursos:", err);
   }
 }
 
 function abrirNovoCurso() {
-  cursoSelecionado.value = null
-  form.nome = ''
-  form.cargaHoraria = null
-  dialog.value = true
+  cursoSelecionado.value = null;
+  form.nome = "";
+  form.cargaHoraria = null;
+  dialog.value = true;
 }
 
 function editarCurso(curso: Curso) {
-  cursoSelecionado.value = curso
-  form.nome = curso.nome
-  form.cargaHoraria = curso.cargaHoraria
-  dialog.value = true
+  cursoSelecionado.value = curso;
+  form.nome = curso.nome;
+  form.cargaHoraria = curso.cargaHoraria;
+  dialog.value = true;
 }
 
 async function salvarCurso() {
-  if (!(await formRef.value?.validate())) return
+  if (!(await formRef.value?.validate())) return;
 
   const body = JSON.stringify({
     nome: form.nome,
     cargaHoraria: form.cargaHoraria,
-  })
+  });
 
-  const isEdit = !!cursoSelecionado.value?.id
+  const isEdit = !!cursoSelecionado.value?.id;
   const url = isEdit
     ? `http://localhost:8080/api/curso/atualizar/${cursoSelecionado.value.id}`
-    : 'http://localhost:8080/api/curso/criar'
+    : "http://localhost:8080/api/curso/criar";
 
-  const method = isEdit ? 'PUT' : 'POST'
+  const method = isEdit ? "PUT" : "POST";
 
   try {
     const res = await fetch(url, {
       method,
       headers: {
-        'Content-Type': 'application/json',
-        Accept: '*/*',
+        "Content-Type": "application/json",
+        Accept: "*/*",
       },
       body,
-    })
+    });
 
-    const result = await res.text()
+    const result = await res.text();
 
     if (res.ok) {
-      dialog.value = false
-      await carregarCursos()
+      dialog.value = false;
+      await carregarCursos();
     } else {
-      alert('Erro: ' + result)
+      alert("Erro: " + result);
     }
   } catch (error) {
-    console.error('Erro ao salvar curso:', error)
+    console.error("Erro ao salvar curso:", error);
   }
 }
 
 async function excluirCurso(id: string) {
-  if (!confirm('Deseja excluir este curso?')) return
+  if (!confirm("Deseja excluir este curso?")) return;
 
   try {
     await fetch(`http://localhost:8080/api/curso/excluir/${id}`, {
-      method: 'DELETE',
-    })
-    await carregarCursos()
+      method: "DELETE",
+    });
+    await carregarCursos();
   } catch (err) {
-    console.error('Erro ao excluir:', err)
+    console.error("Erro ao excluir:", err);
   }
 }
 </script>
