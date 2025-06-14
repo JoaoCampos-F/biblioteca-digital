@@ -1,11 +1,6 @@
 <template>
   <DefaultLayout>
-    <v-container class="d-flex justify-center align-center py-10">
-      <v-card max-width="90%" class="pa-6 rounded-xl elevation-4" width="100%">
-        <v-card-title class="text-h5 font-weight-bold mb-4">
-          Gerenciar Livros
-        </v-card-title>
-
+    <CardContent title="Gerenciar Livros">
         <v-row align="center" class="mb-6">
           <v-col cols="12" md="8">
             <v-text-field
@@ -121,14 +116,15 @@
             </v-card-actions>
           </v-card>
         </v-dialog>
-      </v-card>
-    </v-container>
+    </CardContent>
   </DefaultLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from "vue";
 import DefaultLayout from "../../layout/default.vue";
+import CardContent from "../../components/CardContent.vue";
+
 interface Livro {
   id: string;
   titulo: string;
